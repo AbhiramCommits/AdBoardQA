@@ -2,7 +2,7 @@
   "name": "adboardqa",
   "version": "1.0.0",
   "private": true,
-  "description": "AdBoardQA \u2014 end-to-end quality engineering for a DOOH campaign scheduling app",
+  "description": "AdBoardQA — end-to-end quality engineering for a DOOH campaign scheduling app",
   "license": "MIT",
   "engines": {
     "node": ">=20"
@@ -41,6 +41,7 @@
     "prettier": "^3.4.2",
     "tsx": "^4.19.2",
     "typescript": "~5.6.3",
-    "typescript-eslint": "^8.18.1"
+    "typescript-eslint": "^8.18.1",
+    "wait-on": "^9.5.1"
   }
 }

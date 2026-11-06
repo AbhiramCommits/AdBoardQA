@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck-and-unit:
+    name: Typecheck and unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - name: Unit tests with coverage
+        run: npm run test:unit -- --coverage
+      - name: Write coverage summary
+        run: node scripts/coverage-summary.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: |
+            app/coverage/coverage-summary.json
+            app/coverage/lcov.info
+          if-no-files-found: ignore
+
+  smoke:
+    name: Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Boot API and web
+        run: |
+          npm run dev:api > api.log 2>&1 &
+          npm run dev:web > web.log 2>&1 &
+          npx wait-on --timeout 90000 http://localhost:3001/api/health http://localhost:5173
+      - name: Run smoke suite
+        run: npm run test:smoke
+      - name: Upload videos and screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-videos-screenshots
+          path: |
+            cypress/videos
+            cypress/screenshots
+          if-no-files-found: ignore
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-reports
+          path: cypress/reports
+          if-no-files-found: ignore
+
+  regression:
+    name: Regression shard ${{ matrix.shard }}
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Boot API and web
+        run: |
+          npm run dev:api > api.log 2>&1 &
+          npm run dev:web > web.log 2>&1 &
+          npx wait-on --timeout 90000 http://localhost:3001/api/health http://localhost:5173
+      - name: Run regression shard
+        run: |
+          SPECS=$(node scripts/shard-specs.mjs ${{ matrix.shard }} 2)
+          echo "Shard ${{ matrix.shard }} specs: $SPECS"
+          npx cypress run --env grepTags=@regression --spec "$SPECS"
+      - name: Upload videos and screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-shard-${{ matrix.shard }}-videos-screenshots
+          path: |
+            cypress/videos
+            cypress/screenshots
+          if-no-files-found: ignore
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-reports-shard-${{ matrix.shard }}
+          path: cypress/reports
+          if-no-files-found: ignore
+
+  triage:
+    name: Triage
+    needs: [typecheck-and-unit, smoke, regression]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: '*-reports'
+          path: reports
+          merge-multiple: true
+      - name: Generate failure triage summary
+        run: npm run triage -- reports
