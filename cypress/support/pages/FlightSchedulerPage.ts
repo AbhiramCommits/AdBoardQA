@@ -15,6 +15,27 @@ export class FlightSchedulerPage {
     return this;
   }
 
+  /** Navigate without assuming the page rendered successfully (resilience tests). */
+  open(campaignId: string): this {
+    cy.visit(`/#/campaigns/${campaignId}/flights`);
+    return this;
+  }
+
+  expectScreensEmpty(): this {
+    cy.get('[data-cy="screens-empty"]').should('be.visible');
+    return this;
+  }
+
+  retryScreens(): this {
+    cy.get('[data-cy="retry-screens"]').click();
+    return this;
+  }
+
+  expectScreenOptions(count: number): this {
+    cy.get('[data-cy="screen-select"] option').should('have.length', count + 1);
+    return this;
+  }
+
   expectTitle(title: string): this {
     cy.get('[data-cy="campaign-title"]').should('have.text', title);
     return this;

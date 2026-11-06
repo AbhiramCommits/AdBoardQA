@@ -29,21 +29,12 @@ export async function renderFlightSchedulerPage(
     'Book screens inside the campaign window. A screen cannot be double-booked on this campaign.',
   );
 
-  root.innerHTML = `${header}${loadingMarkup('Loading campaign and screens…')}`;
-
-  let state: SchedulerState;
-  try {
-    const [campaign, screensResponse] = await Promise.all([
-      api.getCampaign(campaignId),
-      api.listScreens(),
-    ]);
-    state = { campaign, screens: screensResponse.screens };
-  } catch {
-    root.innerHTML = `${header}<div class="card"><p data-cy="load-error">The scheduler could not be loaded.</p></div>`;
-    return;
-  }
+  let state: SchedulerState | null = null;
 
   const paint = (): void => {
+    if (!state) {
+      return;
+    }
     const { campaign, screens } = state;
     const screenById = new Map(screens.map((screen) => [screen.id, screen]));
     const metricsById = new Map(campaign.flightMetrics.map((metric) => [metric.flightId, metric]));
@@ -183,7 +174,44 @@ export async function renderFlightSchedulerPage(
     });
   };
 
+  async function load(): Promise<void> {
+    root.innerHTML = `${header}${loadingMarkup('Loading campaign and screens…')}`;
+
+    let campaign: Campaign;
+    try {
+      campaign = await api.getCampaign(campaignId);
+    } catch {
+      root.innerHTML = `${header}<div class="card"><p data-cy="load-error">The campaign could not be loaded.</p><a class="ghost-button" href="#/campaigns">Back to campaigns</a></div>`;
+      return;
+    }
+
+    let screens: Screen[];
+    try {
+      const response = await api.listScreens();
+      screens = response.screens;
+    } catch {
+      root.innerHTML = `
+        ${header}
+        <div class="card empty-state" data-cy="screens-error">
+          <h3>Screens are unavailable</h3>
+          <p data-cy="screens-empty">The screen catalogue could not be loaded. Check the connection and try again.</p>
+          <button class="button" type="button" data-cy="retry-screens">Retry screens</button>
+        </div>
+      `;
+      root.querySelector('[data-cy="retry-screens"]')?.addEventListener('click', () => {
+        void load();
+      });
+      return;
+    }
+
+    state = { campaign, screens };
+    paint();
+  }
+
   async function addFlight(form: HTMLFormElement): Promise<void> {
+    if (!state) {
+      return;
+    }
     clearFormError(root);
     const data = new FormData(form);
     try {
@@ -205,6 +233,9 @@ export async function renderFlightSchedulerPage(
   }
 
   async function deleteFlight(flightId: string): Promise<void> {
+    if (!state) {
+      return;
+    }
     clearFormError(root);
     try {
       const result = await api.deleteFlight(state.campaign.id, flightId);
@@ -219,5 +250,5 @@ export async function renderFlightSchedulerPage(
     }
   }
 
-  paint();
+  await load();
 }

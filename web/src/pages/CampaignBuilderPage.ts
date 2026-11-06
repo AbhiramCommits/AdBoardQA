@@ -34,6 +34,11 @@ export async function renderCampaignBuilderPage(root: HTMLElement): Promise<void
         </div>
       </div>
       ${errorMarkup()}
+      <div class="error-banner" data-cy="error-banner" hidden>
+        <p data-cy="error-banner-message">Campaign could not be created.</p>
+        <button class="ghost-button" type="button" data-cy="retry-create">Retry</button>
+      </div>
+      <p class="muted" data-cy="form-loading" hidden>Creating campaign…</p>
       <div class="form-actions">
         <a class="ghost-button" href="#/campaigns" data-cy="cancel-campaign">Cancel</a>
         <button class="button" type="submit" data-cy="create-campaign">Create campaign</button>
@@ -46,13 +51,55 @@ export async function renderCampaignBuilderPage(root: HTMLElement): Promise<void
     return;
   }
 
+  const submitButton = root.querySelector<HTMLButtonElement>('[data-cy="create-campaign"]');
+  const loading = root.querySelector<HTMLElement>('[data-cy="form-loading"]');
+  const banner = root.querySelector<HTMLElement>('[data-cy="error-banner"]');
+  const bannerMessage = root.querySelector<HTMLElement>('[data-cy="error-banner-message"]');
+  let inFlight = false;
+
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     void submit();
   });
 
+  root.querySelector('[data-cy="retry-create"]')?.addEventListener('click', () => {
+    void submit();
+  });
+
+  function setBusy(busy: boolean): void {
+    if (submitButton) {
+      submitButton.disabled = busy;
+      submitButton.textContent = busy ? 'Creating…' : 'Create campaign';
+    }
+    if (loading) {
+      loading.hidden = !busy;
+    }
+  }
+
+  function hideBanner(): void {
+    if (banner) {
+      banner.hidden = true;
+    }
+  }
+
+  function showBanner(message: string): void {
+    if (bannerMessage) {
+      bannerMessage.textContent = message;
+    }
+    if (banner) {
+      banner.hidden = false;
+    }
+  }
+
   async function submit(): Promise<void> {
+    if (inFlight) {
+      return;
+    }
+    inFlight = true;
     clearFormError(root);
+    hideBanner();
+    setBusy(true);
+
     const data = new FormData(form as HTMLFormElement);
     const budgetValue = String(data.get('budget') ?? '');
     const payload = {
@@ -62,15 +109,21 @@ export async function renderCampaignBuilderPage(root: HTMLElement): Promise<void
       startDate: String(data.get('startDate') ?? ''),
       endDate: String(data.get('endDate') ?? ''),
     };
+
     try {
       const campaign = await api.createCampaign(payload);
       window.location.hash = `#/campaigns/${campaign.id}/flights`;
     } catch (error) {
-      if (error instanceof ApiRequestError) {
+      if (error instanceof ApiRequestError && error.status < 500) {
         showFormError(root, error.payload.message, error.payload.field);
       } else {
-        showFormError(root, 'Campaign could not be created. Please try again.');
+        showBanner(
+          'Campaign could not be created. The server did not respond as expected — retry when the connection is healthy.',
+        );
       }
+    } finally {
+      inFlight = false;
+      setBusy(false);
     }
   }
 }

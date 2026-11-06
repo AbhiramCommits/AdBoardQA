@@ -76,6 +76,28 @@ export class CampaignBuilderPage {
     cy.get('[data-cy="form-error"]').should('not.be.visible');
     return this;
   }
+
+  expectErrorBanner(message: string): this {
+    cy.get('[data-cy="error-banner"]')
+      .should('be.visible')
+      .and('contain.text', message);
+    return this;
+  }
+
+  retryCreate(): this {
+    cy.get('[data-cy="retry-create"]').click();
+    return this;
+  }
+
+  expectLoading(): this {
+    cy.get('[data-cy="form-loading"]').should('be.visible');
+    return this;
+  }
+
+  expectSubmitDisabled(): this {
+    cy.get('[data-cy="create-campaign"]').should('be.disabled');
+    return this;
+  }
 }
 
 export const campaignBuilderPage = new CampaignBuilderPage();

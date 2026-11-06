@@ -73,9 +73,21 @@ export class ApprovalPage {
     return this;
   }
 
-  publish(): this {
+  clickPublish(): this {
     cy.get('[data-cy="publish"]').click();
+    return this;
+  }
+
+  publish(): this {
+    this.clickPublish();
     this.expectStatus('live');
+    return this;
+  }
+
+  expectConflict(message: string): this {
+    cy.get('[data-cy="conflict-message"]')
+      .should('be.visible')
+      .and('contain.text', message);
     return this;
   }
 

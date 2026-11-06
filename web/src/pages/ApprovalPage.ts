@@ -161,6 +161,7 @@ export async function renderApprovalPage(
       <div class="card" data-cy="approval-actions">
         ${actions}
         ${errorMarkup()}
+        <p class="form-error" data-cy="conflict-message" hidden></p>
         <div class="actions-bar">
           <a class="ghost-button" href="#/campaigns/${encodeURIComponent(campaign.id)}/flights" data-cy="back-to-flights">Back to flights</a>
           <a class="ghost-button" href="#/campaigns">All campaigns</a>
@@ -171,8 +172,29 @@ export async function renderApprovalPage(
     bindActions();
   };
 
+  function showConflict(message: string): void {
+    const element = root.querySelector<HTMLElement>('[data-cy="conflict-message"]');
+    if (element) {
+      element.hidden = false;
+      element.textContent = message;
+    }
+  }
+
+  function clearConflict(): void {
+    const element = root.querySelector<HTMLElement>('[data-cy="conflict-message"]');
+    if (element) {
+      element.hidden = true;
+      element.textContent = '';
+    }
+  }
+
   function handleError(error: unknown): void {
     if (error instanceof ApiRequestError) {
+      if (error.status === 409) {
+        clearFormError(root);
+        showConflict(error.payload.message);
+        return;
+      }
       showFormError(root, error.payload.message, error.payload.field);
     } else {
       showFormError(root, 'The action could not be completed. Please try again.');
@@ -181,6 +203,7 @@ export async function renderApprovalPage(
 
   async function perform(action: () => Promise<Campaign>): Promise<void> {
     clearFormError(root);
+    clearConflict();
     try {
       const campaign = await action();
       state = { ...state, campaign };
