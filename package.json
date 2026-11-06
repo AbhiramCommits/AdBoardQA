@@ -1,0 +1,46 @@
+{
+  "name": "adboardqa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AdBoardQA — end-to-end quality engineering for a DOOH campaign scheduling app",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "app",
+    "web"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace app",
+    "dev:web": "npm run dev --workspace web",
+    "dev": "concurrently -k -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
+    "build": "npm run build --workspace app && npm run build --workspace web",
+    "typecheck": "npm run typecheck --workspace app && npm run typecheck --workspace web",
+    "test:unit": "npm run test:unit --workspace app",
+    "test:e2e": "cypress run",
+    "test:smoke": "cypress run --env grepTags=@smoke",
+    "test:regression": "cypress run --env grepTags=@regression",
+    "cy:open": "cypress open",
+    "triage": "tsx scripts/triage.ts",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@cypress/grep": "^4.1.0",
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
+    "concurrently": "^9.1.2",
+    "cypress": "^13.17.0",
+    "cypress-multi-reporters": "^2.0.5",
+    "eslint": "^9.17.0",
+    "eslint-plugin-cypress": "^4.1.0",
+    "fast-xml-parser": "^4.5.1",
+    "mocha-junit-reporter": "^2.2.1",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "~5.6.3",
+    "typescript-eslint": "^8.18.1"
+  }
+}

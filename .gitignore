@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+reports/
+cypress/reports/
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+app/data/*.json
+.env
+.DS_Store
+*.log

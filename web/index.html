@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="AdBoardQA — a DOOH campaign scheduling app under a Cypress quality engineering suite"
+    />
+    <title>AdBoardQA · DOOH Campaign Studio</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#/campaigns">
+        <span class="brand-mark">AB</span>
+        <span>
+          <strong>AdBoardQA</strong>
+          <small>DOOH Campaign Studio</small>
+        </span>
+      </a>
+      <nav class="topnav">
+        <a href="#/campaigns" data-cy="nav-campaigns">Campaigns</a>
+        <a href="#/campaigns/new" data-cy="nav-new-campaign">New campaign</a>
+      </nav>
+      <div class="identity" data-cy="current-user">planner@adboard.test</div>
+    </header>
+    <main id="app" class="shell" aria-live="polite">
+      <p class="muted" data-cy="app-loading">Loading AdBoardQA…</p>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
