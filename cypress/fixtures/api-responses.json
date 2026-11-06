@@ -1,0 +1,22 @@
+{
+  "validationError": {
+    "error": {
+      "code": "NAME_REQUIRED",
+      "message": "Campaign name is required",
+      "field": "name"
+    }
+  },
+  "conflict": {
+    "error": {
+      "code": "INVALID_TRANSITION",
+      "message": "Cannot publish a campaign while it is in draft status",
+      "field": "status"
+    }
+  },
+  "serverError": {
+    "error": {
+      "code": "INTERNAL_ERROR",
+      "message": "Unexpected server error"
+    }
+  }
+}

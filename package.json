@@ -2,7 +2,7 @@
   "name": "adboardqa",
   "version": "1.0.0",
   "private": true,
-  "description": "AdBoardQA — end-to-end quality engineering for a DOOH campaign scheduling app",
+  "description": "AdBoardQA \u2014 end-to-end quality engineering for a DOOH campaign scheduling app",
   "license": "MIT",
   "engines": {
     "node": ">=20"
@@ -16,7 +16,7 @@
     "dev:web": "npm run dev --workspace web",
     "dev": "concurrently -k -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
     "build": "npm run build --workspace app && npm run build --workspace web",
-    "typecheck": "npm run typecheck --workspace app && npm run typecheck --workspace web",
+    "typecheck": "npm run typecheck --workspace app && npm run typecheck --workspace web && tsc -p tsconfig.json --noEmit",
     "test:unit": "npm --workspace app run test:unit --",
     "test:e2e": "cypress run",
     "test:smoke": "cypress run --env grepTags=@smoke",

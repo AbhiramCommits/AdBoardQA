@@ -1,0 +1,46 @@
+{
+  "screens": [
+    {
+      "id": "scr_airport_01",
+      "name": "Skyline Arrivals",
+      "venue": "airport",
+      "dailyImpressions": 42000,
+      "cpm": 18.5
+    },
+    {
+      "id": "scr_airport_02",
+      "name": "Terminal 2 Concourse",
+      "venue": "airport",
+      "dailyImpressions": 31000,
+      "cpm": 16
+    },
+    {
+      "id": "scr_mall_01",
+      "name": "Grand Atrium",
+      "venue": "mall",
+      "dailyImpressions": 58000,
+      "cpm": 12.75
+    },
+    {
+      "id": "scr_mall_02",
+      "name": "Food Court Loop",
+      "venue": "mall",
+      "dailyImpressions": 26500,
+      "cpm": 9.5
+    },
+    {
+      "id": "scr_gym_01",
+      "name": "Peak Fitness Wall",
+      "venue": "gym",
+      "dailyImpressions": 12400,
+      "cpm": 7.25
+    },
+    {
+      "id": "scr_gym_02",
+      "name": "Studio Corridor",
+      "venue": "gym",
+      "dailyImpressions": 8600,
+      "cpm": 6.5
+    }
+  ]
+}

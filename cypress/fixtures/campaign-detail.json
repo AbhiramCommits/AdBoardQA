@@ -1,0 +1,23 @@
+{
+  "id": "cmp_new_1",
+  "name": "Harbor Light Summer Push",
+  "advertiser": "Harbor Light",
+  "budgetCents": 800000,
+  "startDate": "2026-08-01",
+  "endDate": "2026-08-31",
+  "status": "draft",
+  "createdBy": "planner@adboard.test",
+  "createdAt": "2026-01-05T09:00:00.000Z",
+  "updatedAt": "2026-01-05T09:00:00.000Z",
+  "flights": [],
+  "history": [],
+  "totals": {
+    "flightCount": 0,
+    "bookedBudgetCents": 0,
+    "remainingBudgetCents": 800000,
+    "totalImpressions": 0,
+    "averageCpmCents": 0,
+    "mediaValueCents": 0
+  },
+  "flightMetrics": []
+}
