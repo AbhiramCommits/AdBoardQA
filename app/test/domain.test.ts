@@ -108,6 +108,8 @@ describe('campaign validation', () => {
   it('requires a non-empty campaign name', () => {
     expect(validateCampaignName('  Summer Push  ')).toBeNull();
     expect(validateCampaignName('キャンペーン Ünïcode')).toBeNull();
+    expect(validateCampaignName('a'.repeat(120))).toBeNull();
+    expect(validateCampaignName('a'.repeat(121))?.code).toBe('NAME_TOO_LONG');
     expect(validateCampaignName('   ')?.field).toBe('name');
     expect(validateCampaignName('')?.code).toBe('NAME_REQUIRED');
     expect(validateCampaignName(undefined)?.code).toBe('NAME_REQUIRED');
@@ -152,6 +154,9 @@ describe('flight validation', () => {
       validateFlightWindow({ startDate: '2026-01-05', endDate: '2026-01-10' }, campaignWindow),
     ).toBeNull();
     expect(
+      validateFlightWindow({ startDate: '2026-01-05', endDate: '2026-01-05' }, campaignWindow),
+    ).toBeNull();
+    expect(
       validateFlightWindow({ startDate: '2025-12-31', endDate: '2026-01-10' }, campaignWindow)
         ?.code,
     ).toBe('FLIGHT_OUTSIDE_CAMPAIGN');
@@ -176,6 +181,8 @@ describe('flight validation', () => {
 
   it('validates the daily budget is a whole number of cents', () => {
     expect(validateDailyBudget(100)).toBeNull();
+    expect(validateDailyBudget(0)?.code).toBe('DAILY_BUDGET_INVALID');
+    expect(validateDailyBudget(-1)?.code).toBe('DAILY_BUDGET_INVALID');
     expect(validateDailyBudget(1.5)?.code).toBe('DAILY_BUDGET_INVALID');
     expect(validateDailyBudget('100')?.field).toBe('dailyBudgetCents');
   });
@@ -188,6 +195,7 @@ describe('flight validation', () => {
   it('detects overlapping intervals', () => {
     expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-05', '2026-01-15')).toBe(true);
     expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-10', '2026-01-15')).toBe(true);
+    expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-11', '2026-01-15')).toBe(false);
     expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-20', '2026-01-25')).toBe(false);
     expect(rangesOverlap('bad', '2026-01-10', '2026-01-05', '2026-01-15')).toBe(false);
   });

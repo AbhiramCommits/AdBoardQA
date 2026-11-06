@@ -91,6 +91,11 @@ export class FlightSchedulerPage {
     return this;
   }
 
+  expectFlightCost(screenName: string, amount: string): this {
+    this.row(screenName).find('[data-cy="flight-cost"]').should('have.text', amount);
+    return this;
+  }
+
   expectRemainingBudget(amount: string): this {
     cy.get('[data-cy="remaining-budget"]').should('have.text', amount);
     return this;

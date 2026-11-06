@@ -12,7 +12,7 @@ const DRAFT = {
 
 describe('API failure simulation', () => {
   it(
-    'shows a retryable error banner when campaign creation returns 500',
+    'ADQA-008: shows a retryable error banner when campaign creation returns 500',
     { tags: ['@regression'] },
     () => {
       let serverError: unknown;
@@ -40,7 +40,7 @@ describe('API failure simulation', () => {
   );
 
   it(
-    'shows an empty state with retry when the screens request fails at the network layer',
+    'ADQA-009: shows an empty state with retry when the screens request fails at the network layer',
     { tags: ['@regression'] },
     () => {
       cy.resetDb();
@@ -70,7 +70,7 @@ describe('API failure simulation', () => {
   );
 
   it(
-    'surfaces a conflict message when publishing returns 409',
+    'ADQA-010: surfaces a conflict message when publishing returns 409',
     { tags: ['@regression'] },
     () => {
       let conflict: unknown;

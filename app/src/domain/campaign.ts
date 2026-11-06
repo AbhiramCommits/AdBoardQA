@@ -173,6 +173,13 @@ export function validateCampaignName(name: unknown): ValidationIssue | null {
       field: 'name',
     };
   }
+  if (name.trim().length > MAX_CAMPAIGN_NAME_LENGTH) {
+    return {
+      code: 'NAME_TOO_LONG',
+      message: `Campaign name must be ${MAX_CAMPAIGN_NAME_LENGTH} characters or fewer`,
+      field: 'name',
+    };
+  }
   return null;
 }
 
@@ -241,10 +248,10 @@ export function validateFlightWindow(
       field: !start ? 'startDate' : 'endDate',
     };
   }
-  if (end.getTime() <= start.getTime()) {
+  if (end.getTime() < start.getTime()) {
     return {
       code: 'FLIGHT_WINDOW_INVALID',
-      message: 'Flight end date must be after start date',
+      message: 'Flight end date must be on or after start date',
       field: 'endDate',
     };
   }
@@ -266,10 +273,14 @@ export function validateFlightWindow(
 }
 
 export function validateDailyBudget(dailyBudgetCents: unknown): ValidationIssue | null {
-  if (typeof dailyBudgetCents !== 'number' || !Number.isInteger(dailyBudgetCents)) {
+  if (
+    typeof dailyBudgetCents !== 'number' ||
+    !Number.isInteger(dailyBudgetCents) ||
+    dailyBudgetCents <= 0
+  ) {
     return {
       code: 'DAILY_BUDGET_INVALID',
-      message: 'Daily budget must be a whole number of cents',
+      message: 'Daily budget must be a positive whole number of cents',
       field: 'dailyBudgetCents',
     };
   }
@@ -297,7 +308,7 @@ export function rangesOverlap(
   if (!aStart || !aEnd || !bStart || !bEnd) {
     return false;
   }
-  return aStart.getTime() <= bEnd.getTime() + DAY_MS && aEnd.getTime() >= bStart.getTime() - DAY_MS;
+  return aStart.getTime() <= bEnd.getTime() && aEnd.getTime() >= bStart.getTime();
 }
 
 export function findOverlap<T extends FlightWindow>(

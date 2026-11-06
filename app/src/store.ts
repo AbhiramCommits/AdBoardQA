@@ -226,6 +226,9 @@ export class Store {
 
   deleteFlight(campaignId: string, flightId: string, actor: string): CampaignDetail {
     const campaign = this.requireCampaign(campaignId);
+    if (!isEditableStatus(campaign.status)) {
+      throw conflict('CAMPAIGN_LOCKED', 'Flights can only be changed while the campaign is a draft');
+    }
     const index = campaign.flights.findIndex((flight) => flight.id === flightId);
     if (index === -1) {
       throw notFound('Flight');
@@ -274,6 +277,17 @@ export class Store {
         message: 'A reviewer is required to approve a campaign',
         field: 'reviewer',
       });
+    }
+    if (
+      event === 'approve' &&
+      meta.reviewer &&
+      meta.reviewer.trim().toLowerCase() === campaign.createdBy.trim().toLowerCase()
+    ) {
+      throw conflict(
+        'SELF_APPROVAL',
+        'Reviewers cannot approve campaigns they created',
+        'reviewer',
+      );
     }
     if (event === 'reject' && (!meta.reason || meta.reason.trim().length === 0)) {
       throw fromValidationIssue({

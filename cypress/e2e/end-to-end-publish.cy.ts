@@ -37,7 +37,7 @@ describe('End-to-end publish journey', () => {
           dailyBudgetDollars: '450',
         })
         .expectFlightCount(1)
-        .expectTotalCost('$3,600')
+        .expectTotalCost('$3,600.00')
         .continueToReview();
 
       approvalPage

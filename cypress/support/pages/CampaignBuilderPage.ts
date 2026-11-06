@@ -58,6 +58,15 @@ export class CampaignBuilderPage {
     return this;
   }
 
+  doubleClickCreate(): this {
+    cy.get('[data-cy="create-campaign"]').then(($button) => {
+      const element = $button[0] as HTMLElement | undefined;
+      element?.click();
+      element?.click();
+    });
+    return this;
+  }
+
   create(draft: CampaignDraft): this {
     return this.fill(draft).submit();
   }

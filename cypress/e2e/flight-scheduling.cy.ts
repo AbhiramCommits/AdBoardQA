@@ -24,8 +24,8 @@ describe('Flight scheduling', () => {
           })
           .expectFlight('Skyline Arrivals')
           .expectFlightCount(1)
-          .expectTotalCost('$3,600')
-          .expectRemainingBudget('$4,400')
+          .expectTotalCost('$3,600.00')
+          .expectRemainingBudget('$4,400.00')
           .expectImpressions('336,000');
       });
     },
@@ -100,12 +100,12 @@ describe('Flight scheduling', () => {
             dailyBudgetDollars: '500',
           })
           .expectFlightCount(2)
-          .expectTotalCost('$5,600')
-          .expectRemainingBudget('$2,400')
+          .expectTotalCost('$5,600.00')
+          .expectRemainingBudget('$2,400.00')
           .deleteFlight('Skyline Arrivals')
           .expectFlightCount(1)
-          .expectTotalCost('$2,000')
-          .expectRemainingBudget('$6,000')
+          .expectTotalCost('$2,000.00')
+          .expectRemainingBudget('$6,000.00')
           .expectImpressions('232,000');
       });
     },
