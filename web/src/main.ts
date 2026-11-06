@@ -18,24 +18,29 @@ requireElement<HTMLElement>('[data-cy="current-user"]').textContent = currentUse
 
 async function render(): Promise<void> {
   const hash = window.location.hash || '#/campaigns';
-  root.innerHTML = '<p class="muted" data-cy="loading">Loading…</p>';
+  // Each navigation renders into a fresh view. A page whose fetches resolve
+  // after the user has already navigated away writes into its own detached
+  // view instead of overwriting the page that is now on screen.
+  const view = document.createElement('div');
+  root.replaceChildren(view);
+  view.innerHTML = '<p class="muted" data-cy="loading">Loading…</p>';
 
   const flightMatch = /^#\/campaigns\/([^/]+)\/flights$/.exec(hash);
   const reviewMatch = /^#\/campaigns\/([^/]+)\/review$/.exec(hash);
 
   if (hash === '#/campaigns/new') {
-    await renderCampaignBuilderPage(root);
+    await renderCampaignBuilderPage(view);
     return;
   }
   if (flightMatch?.[1]) {
-    await renderFlightSchedulerPage(root, decodeURIComponent(flightMatch[1]));
+    await renderFlightSchedulerPage(view, decodeURIComponent(flightMatch[1]));
     return;
   }
   if (reviewMatch?.[1]) {
-    await renderApprovalPage(root, decodeURIComponent(reviewMatch[1]));
+    await renderApprovalPage(view, decodeURIComponent(reviewMatch[1]));
     return;
   }
-  await renderCampaignListPage(root);
+  await renderCampaignListPage(view);
 }
 
 window.addEventListener('hashchange', () => {
