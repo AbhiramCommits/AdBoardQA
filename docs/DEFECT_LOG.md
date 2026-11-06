@@ -8,19 +8,19 @@ fixed, and every entry now has a passing named regression test.
 **Severity summary:** 1 Critical · 4 High · 5 Medium · 1 Low. **Total: 11 defects.** All 11 are
 covered by named regression tests.
 
-| ID | Title | Severity | Component | Regression test |
-| --- | --- | --- | --- | --- |
-| ADQA-001 | Negative daily flight budget accepted | High | domain / API | `cypress/e2e/defect-regressions.cy.ts:19` |
-| ADQA-002 | Same-day flights rejected | Medium | domain | `cypress/e2e/defect-regressions.cy.ts:38` |
-| ADQA-003 | Adjacent flights falsely rejected as overlapping | Medium | domain | `cypress/e2e/defect-regressions.cy.ts:59` |
-| ADQA-004 | 300-character campaign names accepted | Low | domain / API | `cypress/e2e/defect-regressions.cy.ts:83` |
-| ADQA-005 | Double-click creates duplicate campaigns | High | web UI | `cypress/e2e/defect-regressions.cy.ts:99` |
-| ADQA-006 | Flights can be deleted after approval or publish | High | store / API | `cypress/e2e/defect-regressions.cy.ts:129` |
-| ADQA-007 | Flight costs and totals drop cents in the UI | Medium | web UI | `cypress/e2e/defect-regressions.cy.ts:152` |
-| ADQA-008 | Create 500 has no retryable error banner | Medium | web UI | `cypress/e2e/resilience.cy.ts:15` |
-| ADQA-009 | Screens network failure has no empty state or retry | High | web UI | `cypress/e2e/resilience.cy.ts:43` |
-| ADQA-010 | Publish conflict is rendered as a generic form error | Medium | web UI | `cypress/e2e/resilience.cy.ts:73` |
-| ADQA-011 | Creators can approve their own campaigns | Critical | store / API | `cypress/e2e/defect-regressions.cy.ts:173` |
+| ID       | Title                                                | Severity | Component    | Regression test                            |
+| -------- | ---------------------------------------------------- | -------- | ------------ | ------------------------------------------ |
+| ADQA-001 | Negative daily flight budget accepted                | High     | domain / API | `cypress/e2e/defect-regressions.cy.ts:18`  |
+| ADQA-002 | Same-day flights rejected                            | Medium   | domain       | `cypress/e2e/defect-regressions.cy.ts:36`  |
+| ADQA-003 | Adjacent flights falsely rejected as overlapping     | Medium   | domain       | `cypress/e2e/defect-regressions.cy.ts:54`  |
+| ADQA-004 | 300-character campaign names accepted                | Low      | domain / API | `cypress/e2e/defect-regressions.cy.ts:77`  |
+| ADQA-005 | Double-click creates duplicate campaigns             | High     | web UI       | `cypress/e2e/defect-regressions.cy.ts:90`  |
+| ADQA-006 | Flights can be deleted after approval or publish     | High     | store / API  | `cypress/e2e/defect-regressions.cy.ts:120` |
+| ADQA-007 | Flight costs and totals drop cents in the UI         | Medium   | web UI       | `cypress/e2e/defect-regressions.cy.ts:143` |
+| ADQA-008 | Create 500 has no retryable error banner             | Medium   | web UI       | `cypress/e2e/resilience.cy.ts:15`          |
+| ADQA-009 | Screens network failure has no empty state or retry  | High     | web UI       | `cypress/e2e/resilience.cy.ts:43`          |
+| ADQA-010 | Publish conflict is rendered as a generic form error | Medium   | web UI       | `cypress/e2e/resilience.cy.ts:73`          |
+| ADQA-011 | Creators can approve their own campaigns             | Critical | store / API  | `cypress/e2e/defect-regressions.cy.ts:166` |
 
 ---
 
@@ -41,7 +41,7 @@ covered by named regression tests.
   require a positive amount.
 - **Fix:** require a positive integer, with the message
   “Daily budget must be a positive whole number of cents”.
-- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:19` — passes after the fix.
+- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:18` — passes after the fix.
 
 ## ADQA-002 — Same-day flights rejected
 
@@ -55,7 +55,7 @@ covered by named regression tests.
 - **Root cause:** the flight window used `end <= start`, which is the campaign-level rule, not the
   flight-level rule. A flight occupies whole days inclusively, so `end === start` is valid.
 - **Fix:** reject only `end < start`; message is now “on or after start date”.
-- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:38`.
+- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:36`.
 
 ## ADQA-003 — Adjacent flights falsely rejected as overlapping
 
@@ -69,7 +69,7 @@ covered by named regression tests.
 - **Root cause:** the overlap predicate padded each range by one day on both sides, so
   back-to-back flights looked adjacent.
 - **Fix:** use strict inclusive comparison: `aStart <= bEnd && aEnd >= bStart`.
-- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:59`.
+- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:54`.
 
 ## ADQA-004 — 300-character campaign names accepted
 
@@ -83,7 +83,7 @@ covered by named regression tests.
 - **Actual:** `201`; the full 300-character name was persisted and shown in the UI.
 - **Root cause:** `MAX_CAMPAIGN_NAME_LENGTH` existed but was never used by the validator.
 - **Fix:** reject names longer than 120 characters after trimming.
-- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:83`.
+- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:77`.
 
 ## ADQA-005 — Double-click creates duplicate campaigns
 
@@ -99,7 +99,7 @@ covered by named regression tests.
   The loading-state resilience test (delayed response) also locks the UI behaviour down.
 - **Observed failing regression run (controlled reproduction before the guard was restored):**
   `AssertionError: expected 2 to equal 1`.
-- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:99`.
+- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:90`.
 
 ## ADQA-006 — Flights can be deleted after approval or publish
 
@@ -113,7 +113,7 @@ covered by named regression tests.
 - **Actual:** `200`; the flight was removed from an approved campaign.
 - **Root cause:** `addFlight` checked for draft status, but `deleteFlight` did not.
 - **Fix:** require `draft` before deleting a flight, using the same `CAMPAIGN_LOCKED` conflict.
-- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:129`.
+- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:120`.
 
 ## ADQA-007 — Flight costs and totals drop cents in the UI
 
@@ -129,7 +129,7 @@ covered by named regression tests.
 - **Root cause:** `formatCents` used `Math.round(cents / 100)` and printed whole dollars, so every
   amount lost its cents.
 - **Fix:** floor to dollars and format the remainder as two digits.
-- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:152`.
+- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:143`.
 
 ## ADQA-008 — Create 500 has no retryable error banner
 
@@ -190,7 +190,7 @@ covered by named regression tests.
   `campaign.createdBy`.
 - **Fix:** reject self-approval with `409 SELF_APPROVAL` and field `reviewer`; the UI renders it as
   a conflict message.
-- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:173`.
+- **Regression test:** `cypress/e2e/defect-regressions.cy.ts:166`.
 
 ---
 

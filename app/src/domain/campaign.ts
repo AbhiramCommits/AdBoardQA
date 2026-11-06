@@ -3,7 +3,12 @@
  * the filesystem or the clock, which keeps every rule unit-testable.
  */
 
-export const CAMPAIGN_STATUSES = ['draft', 'pending_approval', 'approved', 'live'] as const;
+export const CAMPAIGN_STATUSES = [
+  'draft',
+  'pending_approval',
+  'approved',
+  'live',
+] as const;
 export type CampaignStatus = (typeof CAMPAIGN_STATUSES)[number];
 
 export const CAMPAIGN_EVENTS = ['submit', 'approve', 'reject', 'publish'] as const;
@@ -262,7 +267,10 @@ export function validateFlightWindow(
       field: 'startDate',
     };
   }
-  if (start.getTime() < campaignStart.getTime() || end.getTime() > campaignEnd.getTime()) {
+  if (
+    start.getTime() < campaignStart.getTime() ||
+    end.getTime() > campaignEnd.getTime()
+  ) {
     return {
       code: 'FLIGHT_OUTSIDE_CAMPAIGN',
       message: 'Flight must fall inside the campaign window',
@@ -317,7 +325,12 @@ export function findOverlap<T extends FlightWindow>(
 ): T | null {
   return (
     existing.find((flight) =>
-      rangesOverlap(candidate.startDate, candidate.endDate, flight.startDate, flight.endDate),
+      rangesOverlap(
+        candidate.startDate,
+        candidate.endDate,
+        flight.startDate,
+        flight.endDate,
+      ),
     ) ?? null
   );
 }
@@ -374,11 +387,18 @@ export function computeCampaignTotals(
   );
   const mediaValueCents = metrics.reduce(
     (total, item) =>
-      total + (item.screen ? Math.round((item.screen.dailyImpressions * item.days * item.screen.cpm) / 1000 * 100) : 0),
+      total +
+      (item.screen
+        ? Math.round(
+            ((item.screen.dailyImpressions * item.days * item.screen.cpm) / 1000) * 100,
+          )
+        : 0),
     0,
   );
   const averageCpmCents =
-    totalImpressions === 0 ? 0 : Math.round((bookedBudgetCents / totalImpressions) * 1000);
+    totalImpressions === 0
+      ? 0
+      : Math.round((bookedBudgetCents / totalImpressions) * 1000);
 
   return {
     flightCount: campaign.flights.length,
@@ -401,5 +421,7 @@ export function isWithinCampaignWindow(
   if (!start || !end || !campaignStart || !campaignEnd) {
     return false;
   }
-  return start.getTime() >= campaignStart.getTime() && end.getTime() <= campaignEnd.getTime();
+  return (
+    start.getTime() >= campaignStart.getTime() && end.getTime() <= campaignEnd.getTime()
+  );
 }

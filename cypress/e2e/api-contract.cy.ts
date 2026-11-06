@@ -67,11 +67,19 @@ describe('REST contract', () => {
       cy.wait('@create').then(({ request, response }) => {
         expect(request.method).to.eq('POST');
         expect(request.url).to.match(/\/api\/campaigns$/);
-        assertSchema(request.body, schemas.createCampaignRequest, 'POST /api/campaigns body');
+        assertSchema(
+          request.body,
+          schemas.createCampaignRequest,
+          'POST /api/campaigns body',
+        );
         expect(request.body.name).to.eq('Contract Campaign');
         expect(request.body.budgetCents).to.eq(800000);
         expect(response?.statusCode).to.eq(201);
-        assertSchema(response?.body, schemas.campaignDetail, 'POST /api/campaigns response');
+        assertSchema(
+          response?.body,
+          schemas.campaignDetail,
+          'POST /api/campaigns response',
+        );
         expect(response?.body.status).to.eq('draft');
       });
 
@@ -213,7 +221,9 @@ describe('REST contract', () => {
         expect(response?.statusCode).to.eq(200);
         assertSchema(response?.body, schemas.campaignDetail, 'reject response');
         expect(response?.body.status).to.eq('draft');
-        expect(response?.body.lastRejection.reason).to.eq('Creative needs a legal review');
+        expect(response?.body.lastRejection.reason).to.eq(
+          'Creative needs a legal review',
+        );
       });
     },
   );

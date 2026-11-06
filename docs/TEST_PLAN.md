@@ -43,18 +43,18 @@ review/approve/publish panel. The state machine has four statuses (`draft`,
 
 ## 3. Risk-based priority
 
-| Area | Risk | Why | Priority |
-| --- | --- | --- | --- |
-| Approval segregation | Critical | A planner approving their own spend defeats financial control (ADQA-011). | P0 |
-| Budget and pricing arithmetic | High | Negative or overflowing flight budgets corrupt spend commitments (ADQA-001). | P0 |
-| Campaign / flight editing after lock | High | Post-approval edits bypass the review gate (ADQA-006). | P0 |
-| Duplicate submission | High | Double-clicking can create duplicate campaigns and duplicate billing (ADQA-005). | P0 |
-| Transition state machine | High | Publishing a draft or re-approving a live campaign breaks the release contract. | P0 |
-| Overlap and date windows | Medium | Incorrect overlap detection blocks valid inventory or allows double-booking (ADQA-002/003). | P1 |
-| Network/API failures | Medium | Users need a recovery path when the API is unavailable (ADQA-008/009/010). | P1 |
-| Money display accuracy | Medium | A plan can be approved on the wrong displayed total (ADQA-007). | P1 |
-| Name and field bounds | Low | Long names are a data-quality issue, not a spend issue (ADQA-004). | P2 |
-| REST contract drift | Medium | UI assumptions silently break when payload shape changes. | P1 |
+| Area                                 | Risk     | Why                                                                                         | Priority |
+| ------------------------------------ | -------- | ------------------------------------------------------------------------------------------- | -------- |
+| Approval segregation                 | Critical | A planner approving their own spend defeats financial control (ADQA-011).                   | P0       |
+| Budget and pricing arithmetic        | High     | Negative or overflowing flight budgets corrupt spend commitments (ADQA-001).                | P0       |
+| Campaign / flight editing after lock | High     | Post-approval edits bypass the review gate (ADQA-006).                                      | P0       |
+| Duplicate submission                 | High     | Double-clicking can create duplicate campaigns and duplicate billing (ADQA-005).            | P0       |
+| Transition state machine             | High     | Publishing a draft or re-approving a live campaign breaks the release contract.             | P0       |
+| Overlap and date windows             | Medium   | Incorrect overlap detection blocks valid inventory or allows double-booking (ADQA-002/003). | P1       |
+| Network/API failures                 | Medium   | Users need a recovery path when the API is unavailable (ADQA-008/009/010).                  | P1       |
+| Money display accuracy               | Medium   | A plan can be approved on the wrong displayed total (ADQA-007).                             | P1       |
+| Name and field bounds                | Low      | Long names are a data-quality issue, not a spend issue (ADQA-004).                          | P2       |
+| REST contract drift                  | Medium   | UI assumptions silently break when payload shape changes.                                   | P1       |
 
 ## 4. Smoke vs regression split
 
@@ -74,52 +74,52 @@ No test carries both tags, which keeps the counts unambiguous.
 
 ## 5. Traceability matrix — business rules
 
-| Rule | Statement | Covering test(s) |
-| --- | --- | --- |
-| BR-01 | Campaign name, advertiser, budget, start and end are required; name ≤ 120 characters. | `campaign-create.cy.ts` “shows inline field errors for every required campaign field”; ADQA-004; domain unit tests. |
-| BR-02 | Campaign end date must be strictly after start date. | `campaign-create.cy.ts` “rejects a campaign whose end date is before its start date”. |
-| BR-03 | Campaign budget is a positive whole number of cents and within the ceiling. | `campaign-create.cy.ts` “rejects a zero-dollar campaign budget”; domain unit tests. |
-| BR-04 | Flight dates must sit inside the campaign window; flight end ≥ start; same-day flights are valid. | ADQA-002; domain unit tests; flight-window/out-of-window unit cases. |
-| BR-05 | Daily flight budget must be a positive whole number of cents. | ADQA-001; domain unit tests. |
-| BR-06 | Sum of flight costs may not exceed the campaign budget. | `flight-scheduling.cy.ts` “rejects a flight that overflows the campaign budget”; domain unit tests. |
-| BR-07 | A screen cannot have overlapping flights on the same campaign; adjacent ranges are allowed. | `flight-scheduling.cy.ts` “rejects overlapping dates…”; ADQA-003; domain unit tests. |
-| BR-08 | Flights can only be added or deleted while the campaign is a draft. | ADQA-006; `approval-workflow.cy.ts` “cannot submit a campaign with no flights” indirectly checks the draft gate. |
-| BR-09 | Status transitions follow draft → pending_approval → approved → live; reject returns to draft. | `approval-workflow.cy.ts` “submits and approves…”, “rejects with a reason…”, “refuses every illegal status transition with 409”; unit test table covers all 16 status/event pairs. |
-| BR-10 | Approval requires a reviewer and that reviewer must not be the creator. | “requires a reviewer header to approve”; ADQA-011. |
-| BR-11 | Rejection requires a non-empty reason and is recorded. | “rejects a missing rejection reason…”; “rejects with a reason…”. |
-| BR-12 | Publish is legal only from approved. | “publishes an approved campaign to live”; illegal-transition table. |
-| BR-13 | Flight costs, totals and remaining budget are accurate to the cent in UI and API. | ADQA-007; “books a flight and computes cost and impressions”; “deletes a flight and recomputes the totals”. |
-| BR-14 | The UI recovers from server/network failures with retry or an explicit conflict message. | ADQA-008, ADQA-009, ADQA-010; resilience spec. |
-| BR-15 | Every endpoint the UI calls honours the documented REST contract. | `api-contract.cy.ts` (six tests, all UI endpoints plus reset and 409). |
+| Rule  | Statement                                                                                         | Covering test(s)                                                                                                                                                                   |
+| ----- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BR-01 | Campaign name, advertiser, budget, start and end are required; name ≤ 120 characters.             | `campaign-create.cy.ts` “shows inline field errors for every required campaign field”; ADQA-004; domain unit tests.                                                                |
+| BR-02 | Campaign end date must be strictly after start date.                                              | `campaign-create.cy.ts` “rejects a campaign whose end date is before its start date”.                                                                                              |
+| BR-03 | Campaign budget is a positive whole number of cents and within the ceiling.                       | `campaign-create.cy.ts` “rejects a zero-dollar campaign budget”; domain unit tests.                                                                                                |
+| BR-04 | Flight dates must sit inside the campaign window; flight end ≥ start; same-day flights are valid. | ADQA-002; domain unit tests; flight-window/out-of-window unit cases.                                                                                                               |
+| BR-05 | Daily flight budget must be a positive whole number of cents.                                     | ADQA-001; domain unit tests.                                                                                                                                                       |
+| BR-06 | Sum of flight costs may not exceed the campaign budget.                                           | `flight-scheduling.cy.ts` “rejects a flight that overflows the campaign budget”; domain unit tests.                                                                                |
+| BR-07 | A screen cannot have overlapping flights on the same campaign; adjacent ranges are allowed.       | `flight-scheduling.cy.ts` “rejects overlapping dates…”; ADQA-003; domain unit tests.                                                                                               |
+| BR-08 | Flights can only be added or deleted while the campaign is a draft.                               | ADQA-006; `approval-workflow.cy.ts` “cannot submit a campaign with no flights” indirectly checks the draft gate.                                                                   |
+| BR-09 | Status transitions follow draft → pending_approval → approved → live; reject returns to draft.    | `approval-workflow.cy.ts` “submits and approves…”, “rejects with a reason…”, “refuses every illegal status transition with 409”; unit test table covers all 16 status/event pairs. |
+| BR-10 | Approval requires a reviewer and that reviewer must not be the creator.                           | “requires a reviewer header to approve”; ADQA-011.                                                                                                                                 |
+| BR-11 | Rejection requires a non-empty reason and is recorded.                                            | “rejects a missing rejection reason…”; “rejects with a reason…”.                                                                                                                   |
+| BR-12 | Publish is legal only from approved.                                                              | “publishes an approved campaign to live”; illegal-transition table.                                                                                                                |
+| BR-13 | Flight costs, totals and remaining budget are accurate to the cent in UI and API.                 | ADQA-007; “books a flight and computes cost and impressions”; “deletes a flight and recomputes the totals”.                                                                        |
+| BR-14 | The UI recovers from server/network failures with retry or an explicit conflict message.          | ADQA-008, ADQA-009, ADQA-010; resilience spec.                                                                                                                                     |
+| BR-15 | Every endpoint the UI calls honours the documented REST contract.                                 | `api-contract.cy.ts` (six tests, all UI endpoints plus reset and 409).                                                                                                             |
 
 ## 6. Traceability matrix — defects
 
-| Defect | Named regression test | File:line |
-| --- | --- | --- |
-| ADQA-001 | rejects a negative daily flight budget | `cypress/e2e/defect-regressions.cy.ts:19` |
-| ADQA-002 | accepts a same-day flight | `cypress/e2e/defect-regressions.cy.ts:38` |
-| ADQA-003 | accepts adjacent, non-overlapping flights on one screen | `cypress/e2e/defect-regressions.cy.ts:59` |
-| ADQA-004 | rejects a 300-character campaign name | `cypress/e2e/defect-regressions.cy.ts:83` |
-| ADQA-005 | double-clicking create sends exactly one POST | `cypress/e2e/defect-regressions.cy.ts:99` |
-| ADQA-006 | refuses to delete a flight after approval or publish | `cypress/e2e/defect-regressions.cy.ts:129` |
-| ADQA-007 | shows cent-accurate flight costs and totals | `cypress/e2e/defect-regressions.cy.ts:152` |
-| ADQA-008 | retryable error banner on create 500 | `cypress/e2e/resilience.cy.ts:15` |
-| ADQA-009 | screens empty state with retry | `cypress/e2e/resilience.cy.ts:43` |
-| ADQA-010 | conflict message on publish 409 | `cypress/e2e/resilience.cy.ts:73` |
-| ADQA-011 | reviewer cannot approve their own campaign | `cypress/e2e/defect-regressions.cy.ts:173` |
+| Defect   | Named regression test                                   | File:line                                  |
+| -------- | ------------------------------------------------------- | ------------------------------------------ |
+| ADQA-001 | rejects a negative daily flight budget                  | `cypress/e2e/defect-regressions.cy.ts:18`  |
+| ADQA-002 | accepts a same-day flight                               | `cypress/e2e/defect-regressions.cy.ts:36`  |
+| ADQA-003 | accepts adjacent, non-overlapping flights on one screen | `cypress/e2e/defect-regressions.cy.ts:54`  |
+| ADQA-004 | rejects a 300-character campaign name                   | `cypress/e2e/defect-regressions.cy.ts:77`  |
+| ADQA-005 | double-clicking create sends exactly one POST           | `cypress/e2e/defect-regressions.cy.ts:90`  |
+| ADQA-006 | refuses to delete a flight after approval or publish    | `cypress/e2e/defect-regressions.cy.ts:120` |
+| ADQA-007 | shows cent-accurate flight costs and totals             | `cypress/e2e/defect-regressions.cy.ts:143` |
+| ADQA-008 | retryable error banner on create 500                    | `cypress/e2e/resilience.cy.ts:15`          |
+| ADQA-009 | screens empty state with retry                          | `cypress/e2e/resilience.cy.ts:43`          |
+| ADQA-010 | conflict message on publish 409                         | `cypress/e2e/resilience.cy.ts:73`          |
+| ADQA-011 | reviewer cannot approve their own campaign              | `cypress/e2e/defect-regressions.cy.ts:166` |
 
 ## 7. Test inventory
 
-| Spec | Purpose | Tests |
-| --- | --- | --- |
-| `campaign-create.cy.ts` | Builder happy path and validation boundaries | 4 |
-| `flight-scheduling.cy.ts` | Booking, budget overflow, overlap, deletion and recomputation | 4 |
-| `approval-workflow.cy.ts` | Submit/approve/reject/publish plus every illegal transition | 7 |
-| `end-to-end-publish.cy.ts` | One journey from create to live, checked in UI and API | 1 |
-| `api-contract.cy.ts` | Method, URL, request/response schema, 201/422/409 | 6 |
-| `resilience.cy.ts` | 500, network error, 409 conflict, delayed response, loading state | 4 |
-| `defect-regressions.cy.ts` | One named regression test per exploratory defect | 8 |
-| **Total** | | **34** |
+| Spec                       | Purpose                                                           | Tests  |
+| -------------------------- | ----------------------------------------------------------------- | ------ |
+| `campaign-create.cy.ts`    | Builder happy path and validation boundaries                      | 4      |
+| `flight-scheduling.cy.ts`  | Booking, budget overflow, overlap, deletion and recomputation     | 4      |
+| `approval-workflow.cy.ts`  | Submit/approve/reject/publish plus every illegal transition       | 7      |
+| `end-to-end-publish.cy.ts` | One journey from create to live, checked in UI and API            | 1      |
+| `api-contract.cy.ts`       | Method, URL, request/response schema, 201/422/409                 | 6      |
+| `resilience.cy.ts`         | 500, network error, 409 conflict, delayed response, loading state | 4      |
+| `defect-regressions.cy.ts` | One named regression test per exploratory defect                  | 8      |
+| **Total**                  |                                                                   | **34** |
 
 Smoke: 4 tests. Regression: 30 tests.
 

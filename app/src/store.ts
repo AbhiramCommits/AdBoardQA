@@ -155,7 +155,10 @@ export class Store {
   addFlight(campaignId: string, input: CreateFlightInput, actor: string): CampaignDetail {
     const campaign = this.requireCampaign(campaignId);
     if (!isEditableStatus(campaign.status)) {
-      throw conflict('CAMPAIGN_LOCKED', 'Flights can only be changed while the campaign is a draft');
+      throw conflict(
+        'CAMPAIGN_LOCKED',
+        'Flights can only be changed while the campaign is a draft',
+      );
     }
 
     const screen = this.getScreen(input.screenId);
@@ -188,7 +191,8 @@ export class Store {
     const days = daysInclusive(input.startDate, input.endDate);
     const existingBookedCents = campaign.flights.reduce(
       (total, flight) =>
-        total + flightCostCents(flight.dailyBudgetCents, flight.startDate, flight.endDate),
+        total +
+        flightCostCents(flight.dailyBudgetCents, flight.startDate, flight.endDate),
       0,
     );
     const campaignBudgetIssue = validateFlightBudget(
@@ -227,7 +231,10 @@ export class Store {
   deleteFlight(campaignId: string, flightId: string, actor: string): CampaignDetail {
     const campaign = this.requireCampaign(campaignId);
     if (!isEditableStatus(campaign.status)) {
-      throw conflict('CAMPAIGN_LOCKED', 'Flights can only be changed while the campaign is a draft');
+      throw conflict(
+        'CAMPAIGN_LOCKED',
+        'Flights can only be changed while the campaign is a draft',
+      );
     }
     const index = campaign.flights.findIndex((flight) => flight.id === flightId);
     if (index === -1) {

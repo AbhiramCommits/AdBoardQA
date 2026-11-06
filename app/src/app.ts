@@ -48,24 +48,26 @@ export function createApp(options: AppOptions = {}): express.Express {
     });
   });
 
-  app.use((error: unknown, _request: Request, response: Response, _next: NextFunction) => {
-    if (error instanceof AppError) {
-      response.status(error.status).json({
-        error: { code: error.code, message: error.message, field: error.field },
+  app.use(
+    (error: unknown, _request: Request, response: Response, _next: NextFunction) => {
+      if (error instanceof AppError) {
+        response.status(error.status).json({
+          error: { code: error.code, message: error.message, field: error.field },
+        });
+        return;
+      }
+      if (error instanceof SyntaxError && 'body' in error) {
+        response.status(400).json({
+          error: { code: 'INVALID_JSON', message: 'Request body must be valid JSON' },
+        });
+        return;
+      }
+      console.error(error);
+      response.status(500).json({
+        error: { code: 'INTERNAL_ERROR', message: 'Unexpected server error' },
       });
-      return;
-    }
-    if (error instanceof SyntaxError && 'body' in error) {
-      response.status(400).json({
-        error: { code: 'INVALID_JSON', message: 'Request body must be valid JSON' },
-      });
-      return;
-    }
-    console.error(error);
-    response.status(500).json({
-      error: { code: 'INTERNAL_ERROR', message: 'Unexpected server error' },
-    });
-  });
+    },
+  );
 
   return app;
 }

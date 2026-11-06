@@ -8,28 +8,24 @@ describe('Flight scheduling', () => {
     });
   });
 
-  it(
-    'books a flight and computes cost and impressions',
-    { tags: ['@smoke'] },
-    () => {
-      cy.get<string>('@campaignId').then((campaignId) => {
-        flightSchedulerPage
-          .visit(campaignId)
-          .expectStatus('draft')
-          .addFlight({
-            screenId: 'scr_airport_01',
-            startDate: '2026-08-03',
-            endDate: '2026-08-10',
-            dailyBudgetDollars: '450',
-          })
-          .expectFlight('Skyline Arrivals')
-          .expectFlightCount(1)
-          .expectTotalCost('$3,600.00')
-          .expectRemainingBudget('$4,400.00')
-          .expectImpressions('336,000');
-      });
-    },
-  );
+  it('books a flight and computes cost and impressions', { tags: ['@smoke'] }, () => {
+    cy.get<string>('@campaignId').then((campaignId) => {
+      flightSchedulerPage
+        .visit(campaignId)
+        .expectStatus('draft')
+        .addFlight({
+          screenId: 'scr_airport_01',
+          startDate: '2026-08-03',
+          endDate: '2026-08-10',
+          dailyBudgetDollars: '450',
+        })
+        .expectFlight('Skyline Arrivals')
+        .expectFlightCount(1)
+        .expectTotalCost('$3,600.00')
+        .expectRemainingBudget('$4,400.00')
+        .expectImpressions('336,000');
+    });
+  });
 
   it(
     'rejects a flight that overflows the campaign budget',
@@ -44,10 +40,7 @@ describe('Flight scheduling', () => {
             endDate: '2026-08-31',
             dailyBudgetDollars: '2000',
           })
-          .expectFieldError(
-            'dailyBudgetCents',
-            'exceeds the remaining campaign budget',
-          )
+          .expectFieldError('dailyBudgetCents', 'exceeds the remaining campaign budget')
           .expectFlightCount(0)
           .expectNoFlights();
       });
@@ -80,34 +73,30 @@ describe('Flight scheduling', () => {
     },
   );
 
-  it(
-    'deletes a flight and recomputes the totals',
-    { tags: ['@regression'] },
-    () => {
-      cy.get<string>('@campaignId').then((campaignId) => {
-        flightSchedulerPage
-          .visit(campaignId)
-          .addFlight({
-            screenId: 'scr_airport_01',
-            startDate: '2026-08-03',
-            endDate: '2026-08-10',
-            dailyBudgetDollars: '450',
-          })
-          .addFlight({
-            screenId: 'scr_mall_01',
-            startDate: '2026-08-12',
-            endDate: '2026-08-15',
-            dailyBudgetDollars: '500',
-          })
-          .expectFlightCount(2)
-          .expectTotalCost('$5,600.00')
-          .expectRemainingBudget('$2,400.00')
-          .deleteFlight('Skyline Arrivals')
-          .expectFlightCount(1)
-          .expectTotalCost('$2,000.00')
-          .expectRemainingBudget('$6,000.00')
-          .expectImpressions('232,000');
-      });
-    },
-  );
+  it('deletes a flight and recomputes the totals', { tags: ['@regression'] }, () => {
+    cy.get<string>('@campaignId').then((campaignId) => {
+      flightSchedulerPage
+        .visit(campaignId)
+        .addFlight({
+          screenId: 'scr_airport_01',
+          startDate: '2026-08-03',
+          endDate: '2026-08-10',
+          dailyBudgetDollars: '450',
+        })
+        .addFlight({
+          screenId: 'scr_mall_01',
+          startDate: '2026-08-12',
+          endDate: '2026-08-15',
+          dailyBudgetDollars: '500',
+        })
+        .expectFlightCount(2)
+        .expectTotalCost('$5,600.00')
+        .expectRemainingBudget('$2,400.00')
+        .deleteFlight('Skyline Arrivals')
+        .expectFlightCount(1)
+        .expectTotalCost('$2,000.00')
+        .expectRemainingBudget('$6,000.00')
+        .expectImpressions('232,000');
+    });
+  });
 });

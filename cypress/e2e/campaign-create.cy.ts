@@ -8,34 +8,26 @@ describe('Campaign creation', () => {
     campaignListPage.visit();
   });
 
-  it(
-    'creates a campaign and opens the flight scheduler',
-    { tags: ['@smoke'] },
-    () => {
-      cy.intercept('POST', '/api/campaigns').as('createCampaign');
+  it('creates a campaign and opens the flight scheduler', { tags: ['@smoke'] }, () => {
+    cy.intercept('POST', '/api/campaigns').as('createCampaign');
 
-      campaignListPage.startNewCampaign();
-      campaignBuilderPage
-        .expectFormVisible()
-        .create({
-          name: 'Harbor Light Summer Push',
-          advertiser: 'Harbor Light',
-          budgetDollars: '8000',
-          startDate: '2026-08-01',
-          endDate: '2026-08-31',
-        });
+    campaignListPage.startNewCampaign();
+    campaignBuilderPage.expectFormVisible().create({
+      name: 'Harbor Light Summer Push',
+      advertiser: 'Harbor Light',
+      budgetDollars: '8000',
+      startDate: '2026-08-01',
+      endDate: '2026-08-31',
+    });
 
-      cy.wait('@createCampaign').its('response.statusCode').should('eq', 201);
-      flightSchedulerPage
-        .expectTitle('Harbor Light Summer Push')
-        .expectStatus('draft');
+    cy.wait('@createCampaign').its('response.statusCode').should('eq', 201);
+    flightSchedulerPage.expectTitle('Harbor Light Summer Push').expectStatus('draft');
 
-      campaignListPage
-        .visit()
-        .expectCampaign('Harbor Light Summer Push')
-        .expectStatus('Harbor Light Summer Push', 'draft');
-    },
-  );
+    campaignListPage
+      .visit()
+      .expectCampaign('Harbor Light Summer Push')
+      .expectStatus('Harbor Light Summer Push', 'draft');
+  });
 
   it(
     'shows inline field errors for every required campaign field',
@@ -56,7 +48,10 @@ describe('Campaign creation', () => {
       campaignBuilderPage
         .fillField('advertiser', 'Harbor Light')
         .submit()
-        .expectFieldError('budgetCents', 'Budget must be a positive whole number of cents');
+        .expectFieldError(
+          'budgetCents',
+          'Budget must be a positive whole number of cents',
+        );
 
       campaignBuilderPage
         .fillField('budget', '8000')
@@ -68,9 +63,7 @@ describe('Campaign creation', () => {
         .submit()
         .expectFieldError('endDate', 'Dates must use YYYY-MM-DD');
 
-      campaignBuilderPage
-        .fillField('endDate', '2026-08-31')
-        .submit();
+      campaignBuilderPage.fillField('endDate', '2026-08-31').submit();
 
       flightSchedulerPage.expectTitle('Harbor Light Summer Push');
     },
@@ -96,20 +89,16 @@ describe('Campaign creation', () => {
     },
   );
 
-  it(
-    'rejects a zero-dollar campaign budget',
-    { tags: ['@regression'] },
-    () => {
-      campaignListPage.startNewCampaign();
-      campaignBuilderPage
-        .create({
-          name: 'No Budget',
-          advertiser: 'Empty Wallet',
-          budgetDollars: '0',
-          startDate: '2026-08-01',
-          endDate: '2026-08-31',
-        })
-        .expectFieldError('budgetCents', 'Budget must be a positive whole number of cents');
-    },
-  );
+  it('rejects a zero-dollar campaign budget', { tags: ['@regression'] }, () => {
+    campaignListPage.startNewCampaign();
+    campaignBuilderPage
+      .create({
+        name: 'No Budget',
+        advertiser: 'Empty Wallet',
+        budgetDollars: '0',
+        startDate: '2026-08-01',
+        endDate: '2026-08-31',
+      })
+      .expectFieldError('budgetCents', 'Budget must be a positive whole number of cents');
+  });
 });

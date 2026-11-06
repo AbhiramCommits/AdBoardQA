@@ -86,7 +86,9 @@ function validateValue(
         return;
       }
       if (schema.minItems !== undefined && value.length < schema.minItems) {
-        errors.push(`${path}: expected at least ${schema.minItems} items, received ${value.length}`);
+        errors.push(
+          `${path}: expected at least ${schema.minItems} items, received ${value.length}`,
+        );
       }
       value.forEach((item, index) => {
         validateValue(item, schema.items, `${path}[${index}]`, errors);

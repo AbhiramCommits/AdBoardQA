@@ -56,8 +56,7 @@ class JsonSummaryReporter extends Mocha.reporters.Base {
       const spec =
         (runner.suite && (runner.suite.file || runner.suite.title)) ||
         `spec-${Date.now()}`;
-      const duration =
-        (runner.stats && runner.stats.duration) || Date.now() - startedAt;
+      const duration = (runner.stats && runner.stats.duration) || Date.now() - startedAt;
       const payload = {
         spec,
         stats: {

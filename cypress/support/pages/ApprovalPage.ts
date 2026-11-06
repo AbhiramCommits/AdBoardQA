@@ -30,7 +30,8 @@ export class ApprovalPage {
   }
 
   typeReviewer(reviewer: string): this {
-    cy.get('[data-cy="reviewer-input"]').clear().type(reviewer);
+    cy.get('[data-cy="reviewer-input"]').clear();
+    cy.get('[data-cy="reviewer-input"]').type(reviewer);
     return this;
   }
 
@@ -49,7 +50,8 @@ export class ApprovalPage {
   }
 
   typeRejectionReason(reason: string): this {
-    cy.get('[data-cy="reject-reason"]').clear().type(reason);
+    cy.get('[data-cy="reject-reason"]').clear();
+    cy.get('[data-cy="reject-reason"]').type(reason);
     return this;
   }
 

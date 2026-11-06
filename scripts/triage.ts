@@ -67,10 +67,7 @@ function parseJsonResults(): SpecResult[] {
   // Smoke and regression runs produce one report per spec. Merge by test title
   // across reports so a test that is pending in one tagged run and executed in
   // another is counted exactly once.
-  const specs = new Map<
-    string,
-    { durationMs: number; tests: Map<string, MergedTest> }
-  >();
+  const specs = new Map<string, { durationMs: number; tests: Map<string, MergedTest> }>();
 
   for (const file of walk(reportDirectory, '.json')) {
     try {
@@ -81,7 +78,10 @@ function parseJsonResults(): SpecResult[] {
         continue;
       }
 
-      const entry = specs.get(spec) ?? { durationMs: 0, tests: new Map<string, MergedTest>() };
+      const entry = specs.get(spec) ?? {
+        durationMs: 0,
+        tests: new Map<string, MergedTest>(),
+      };
       entry.durationMs = Math.max(entry.durationMs, numberAttribute(stats['duration']));
 
       for (const rawTest of asArray(parsed['tests'])) {
@@ -170,7 +170,10 @@ function parseJunitResults(): SpecResult[] {
           const failure = asRecord(testCase['failure']);
           if (Object.keys(failure).length > 0) {
             failureMessages.push({
-              title: typeof testCase['@_name'] === 'string' ? testCase['@_name'] : 'unnamed test',
+              title:
+                typeof testCase['@_name'] === 'string'
+                  ? testCase['@_name']
+                  : 'unnamed test',
               message:
                 typeof failure['@_message'] === 'string'
                   ? failure['@_message']
@@ -183,7 +186,10 @@ function parseJunitResults(): SpecResult[] {
       }
 
       if (!spec) {
-        spec = path.basename(file).replace(/^results-/, '').replace(/\.xml$/, '');
+        spec = path
+          .basename(file)
+          .replace(/^results-/, '')
+          .replace(/\.xml$/, '');
       }
       results.push({
         spec,
@@ -272,7 +278,9 @@ function buildMarkdown(results: SpecResult[]): string {
     for (const result of failing) {
       lines.push(`#### ${result.spec} (${result.failures} failed)`, '');
       for (const failure of result.failureMessages) {
-        lines.push(`- **${failure.title}** — ${failure.message.replace(/\s+/g, ' ').trim()}`);
+        lines.push(
+          `- **${failure.title}** — ${failure.message.replace(/\s+/g, ' ').trim()}`,
+        );
       }
       lines.push('');
     }

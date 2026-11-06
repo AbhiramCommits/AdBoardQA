@@ -17,12 +17,10 @@ const DEFAULT_CAMPAIGN: CampaignPayload = {
 };
 
 Cypress.Commands.add('resetDb', () => {
-  return cy
-    .request({ method: 'POST', url: '/api/test/reset' })
-    .then((response) => {
-      expect(response.status).to.eq(200);
-      return response.body as { ok: boolean; screens: number; campaigns: number };
-    });
+  return cy.request({ method: 'POST', url: '/api/test/reset' }).then((response) => {
+    expect(response.status).to.eq(200);
+    return response.body as { ok: boolean; screens: number; campaigns: number };
+  });
 });
 
 Cypress.Commands.add('apiCreateCampaign', (payload: Partial<CampaignPayload> = {}) => {

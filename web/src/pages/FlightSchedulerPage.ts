@@ -1,10 +1,4 @@
-import {
-  ApiRequestError,
-  api,
-  statusLabel,
-  type Campaign,
-  type Screen,
-} from '../api';
+import { ApiRequestError, api, statusLabel, type Campaign, type Screen } from '../api';
 import { dollarsToCents, escapeHtml, formatCents, formatNumber } from '../format';
 import {
   clearFormError,
@@ -37,7 +31,9 @@ export async function renderFlightSchedulerPage(
     }
     const { campaign, screens } = state;
     const screenById = new Map(screens.map((screen) => [screen.id, screen]));
-    const metricsById = new Map(campaign.flightMetrics.map((metric) => [metric.flightId, metric]));
+    const metricsById = new Map(
+      campaign.flightMetrics.map((metric) => [metric.flightId, metric]),
+    );
 
     const rows = campaign.flights
       .map((flight) => {
@@ -163,15 +159,17 @@ export async function renderFlightSchedulerPage(
       void addFlight(form);
     });
 
-    root.querySelectorAll<HTMLButtonElement>('[data-cy="delete-flight"]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const row = button.closest<HTMLElement>('[data-cy="flight-row"]');
-        const flightId = row?.dataset['flightId'];
-        if (flightId) {
-          void deleteFlight(flightId);
-        }
+    root
+      .querySelectorAll<HTMLButtonElement>('[data-cy="delete-flight"]')
+      .forEach((button) => {
+        button.addEventListener('click', () => {
+          const row = button.closest<HTMLElement>('[data-cy="flight-row"]');
+          const flightId = row?.dataset['flightId'];
+          if (flightId) {
+            void deleteFlight(flightId);
+          }
+        });
       });
-    });
   };
 
   async function load(): Promise<void> {

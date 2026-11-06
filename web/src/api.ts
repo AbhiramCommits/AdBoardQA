@@ -150,7 +150,10 @@ export const api = {
   createCampaign: (input: CreateCampaignInput) =>
     request<Campaign>('/campaigns', { method: 'POST', body: input }),
   addFlight: (campaignId: string, input: CreateFlightInput) =>
-    request<Campaign>(`/campaigns/${campaignId}/flights`, { method: 'POST', body: input }),
+    request<Campaign>(`/campaigns/${campaignId}/flights`, {
+      method: 'POST',
+      body: input,
+    }),
   deleteFlight: (campaignId: string, flightId: string) =>
     request<{ deletedFlightId: string; campaign: Campaign }>(
       `/campaigns/${campaignId}/flights/${flightId}`,

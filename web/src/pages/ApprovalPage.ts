@@ -48,7 +48,9 @@ export async function renderApprovalPage(
   const paint = (): void => {
     const { campaign } = state;
     const screenById = new Map(state.screens.map((screen) => [screen.id, screen]));
-    const metricsById = new Map(campaign.flightMetrics.map((metric) => [metric.flightId, metric]));
+    const metricsById = new Map(
+      campaign.flightMetrics.map((metric) => [metric.flightId, metric]),
+    );
 
     const flightRows = campaign.flights
       .map((flight) => {
@@ -219,13 +221,16 @@ export async function renderApprovalPage(
       void perform(() => api.submit(id));
     });
     root.querySelector('[data-cy="approve"]')?.addEventListener('click', () => {
-      const reviewer = root.querySelector<HTMLInputElement>('[data-cy="reviewer-input"]')?.value ?? '';
+      const reviewer =
+        root.querySelector<HTMLInputElement>('[data-cy="reviewer-input"]')?.value ?? '';
       setCurrentReviewer(reviewer);
       void perform(() => api.approve(id, reviewer));
     });
     root.querySelector('[data-cy="reject"]')?.addEventListener('click', () => {
-      const reviewer = root.querySelector<HTMLInputElement>('[data-cy="reviewer-input"]')?.value ?? '';
-      const reason = root.querySelector<HTMLTextAreaElement>('[data-cy="reject-reason"]')?.value ?? '';
+      const reviewer =
+        root.querySelector<HTMLInputElement>('[data-cy="reviewer-input"]')?.value ?? '';
+      const reason =
+        root.querySelector<HTMLTextAreaElement>('[data-cy="reject-reason"]')?.value ?? '';
       setCurrentReviewer(reviewer);
       void perform(() => api.reject(id, reason, reviewer));
     });

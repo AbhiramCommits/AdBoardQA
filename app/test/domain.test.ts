@@ -127,7 +127,9 @@ describe('campaign validation', () => {
     expect(validateCampaignBudget(0)?.code).toBe('BUDGET_INVALID');
     expect(validateCampaignBudget(-100)?.code).toBe('BUDGET_INVALID');
     expect(validateCampaignBudget(10.5)?.code).toBe('BUDGET_INVALID');
-    expect(validateCampaignBudget(MAX_CAMPAIGN_BUDGET_CENTS + 1)?.code).toBe('BUDGET_INVALID');
+    expect(validateCampaignBudget(MAX_CAMPAIGN_BUDGET_CENTS + 1)?.code).toBe(
+      'BUDGET_INVALID',
+    );
     expect(validateCampaignBudget('100')?.field).toBe('budgetCents');
   });
 
@@ -151,25 +153,38 @@ describe('flight validation', () => {
 
   it('keeps flights inside the campaign window', () => {
     expect(
-      validateFlightWindow({ startDate: '2026-01-05', endDate: '2026-01-10' }, campaignWindow),
+      validateFlightWindow(
+        { startDate: '2026-01-05', endDate: '2026-01-10' },
+        campaignWindow,
+      ),
     ).toBeNull();
     expect(
-      validateFlightWindow({ startDate: '2026-01-05', endDate: '2026-01-05' }, campaignWindow),
+      validateFlightWindow(
+        { startDate: '2026-01-05', endDate: '2026-01-05' },
+        campaignWindow,
+      ),
     ).toBeNull();
     expect(
-      validateFlightWindow({ startDate: '2025-12-31', endDate: '2026-01-10' }, campaignWindow)
-        ?.code,
+      validateFlightWindow(
+        { startDate: '2025-12-31', endDate: '2026-01-10' },
+        campaignWindow,
+      )?.code,
     ).toBe('FLIGHT_OUTSIDE_CAMPAIGN');
     expect(
-      validateFlightWindow({ startDate: '2026-01-05', endDate: '2026-02-01' }, campaignWindow)
-        ?.code,
+      validateFlightWindow(
+        { startDate: '2026-01-05', endDate: '2026-02-01' },
+        campaignWindow,
+      )?.code,
     ).toBe('FLIGHT_OUTSIDE_CAMPAIGN');
     expect(
-      validateFlightWindow({ startDate: '2026-01-10', endDate: '2026-01-05' }, campaignWindow)
-        ?.code,
+      validateFlightWindow(
+        { startDate: '2026-01-10', endDate: '2026-01-05' },
+        campaignWindow,
+      )?.code,
     ).toBe('FLIGHT_WINDOW_INVALID');
     expect(
-      validateFlightWindow({ startDate: 'bad', endDate: '2026-01-05' }, campaignWindow)?.field,
+      validateFlightWindow({ startDate: 'bad', endDate: '2026-01-05' }, campaignWindow)
+        ?.field,
     ).toBe('startDate');
     expect(
       validateFlightWindow(
@@ -193,19 +208,32 @@ describe('flight validation', () => {
   });
 
   it('detects overlapping intervals', () => {
-    expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-05', '2026-01-15')).toBe(true);
-    expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-10', '2026-01-15')).toBe(true);
-    expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-11', '2026-01-15')).toBe(false);
-    expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-20', '2026-01-25')).toBe(false);
+    expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-05', '2026-01-15')).toBe(
+      true,
+    );
+    expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-10', '2026-01-15')).toBe(
+      true,
+    );
+    expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-11', '2026-01-15')).toBe(
+      false,
+    );
+    expect(rangesOverlap('2026-01-01', '2026-01-10', '2026-01-20', '2026-01-25')).toBe(
+      false,
+    );
     expect(rangesOverlap('bad', '2026-01-10', '2026-01-05', '2026-01-15')).toBe(false);
   });
 
   it('finds the first overlapping flight', () => {
-    const existing = [flight(), flight({ id: 'flt_2', startDate: '2026-01-20', endDate: '2026-01-22' })];
-    expect(findOverlap(existing, { startDate: '2026-01-02', endDate: '2026-01-04' })?.id).toBe(
-      'flt_1',
-    );
-    expect(findOverlap(existing, { startDate: '2026-01-10', endDate: '2026-01-12' })).toBeNull();
+    const existing = [
+      flight(),
+      flight({ id: 'flt_2', startDate: '2026-01-20', endDate: '2026-01-22' }),
+    ];
+    expect(
+      findOverlap(existing, { startDate: '2026-01-02', endDate: '2026-01-04' })?.id,
+    ).toBe('flt_1');
+    expect(
+      findOverlap(existing, { startDate: '2026-01-10', endDate: '2026-01-12' }),
+    ).toBeNull();
   });
 
   it('rejects a flight that overflows the remaining campaign budget', () => {
@@ -229,10 +257,7 @@ describe('flight validation', () => {
       ),
     ).toBe(false);
     expect(
-      isWithinCampaignWindow(
-        { startDate: 'bad', endDate: '2026-01-10' },
-        campaignWindow,
-      ),
+      isWithinCampaignWindow({ startDate: 'bad', endDate: '2026-01-10' }, campaignWindow),
     ).toBe(false);
   });
 });

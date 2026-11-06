@@ -8,7 +8,10 @@ function actorFrom(request: Request): string {
   return request.header('x-user')?.trim() || DEFAULT_ACTOR;
 }
 
-function reviewerFrom(request: Request, body: Record<string, unknown>): string | undefined {
+function reviewerFrom(
+  request: Request,
+  body: Record<string, unknown>,
+): string | undefined {
   const header = request.header('x-reviewer')?.trim();
   if (header) {
     return header;
@@ -59,7 +62,11 @@ export function createCampaignsRouter(store: Store): Router {
       endDate: stringField(body['endDate']),
       dailyBudgetCents: numberField(body['dailyBudgetCents']),
     };
-    const campaign = store.addFlight(request.params['id'] ?? '', input, actorFrom(request));
+    const campaign = store.addFlight(
+      request.params['id'] ?? '',
+      input,
+      actorFrom(request),
+    );
     response.status(201).json(campaign);
   });
 
@@ -74,12 +81,18 @@ export function createCampaignsRouter(store: Store): Router {
   });
 
   const action =
-    (event: CampaignEvent) => (request: Request, response: Response): void => {
+    (event: CampaignEvent) =>
+    (request: Request, response: Response): void => {
       const body = (request.body ?? {}) as Record<string, unknown>;
-      const campaign = store.transition(request.params['id'] ?? '', event, actorFrom(request), {
-        reviewer: reviewerFrom(request, body),
-        reason: stringField(body['reason']),
-      });
+      const campaign = store.transition(
+        request.params['id'] ?? '',
+        event,
+        actorFrom(request),
+        {
+          reviewer: reviewerFrom(request, body),
+          reason: stringField(body['reason']),
+        },
+      );
       response.status(200).json(campaign);
     };
 

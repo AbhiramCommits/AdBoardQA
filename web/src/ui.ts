@@ -20,11 +20,7 @@ export function errorMarkup(): string {
   return '<p class="form-error" data-cy="form-error" hidden></p>';
 }
 
-export function showFormError(
-  root: ParentNode,
-  message: string,
-  field?: string,
-): void {
+export function showFormError(root: ParentNode, message: string, field?: string): void {
   const element = root.querySelector<HTMLElement>('[data-cy="form-error"]');
   if (!element) {
     return;

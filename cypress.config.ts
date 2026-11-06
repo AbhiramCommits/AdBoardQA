@@ -1,7 +1,6 @@
 import { defineConfig } from 'cypress';
 
 // @cypress/grep's plugin has no published TypeScript declaration for its subpath.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const cypressGrepPlugin = require('@cypress/grep/src/plugin') as (
   config: Cypress.PluginConfigOptions,
 ) => Cypress.PluginConfigOptions;
@@ -22,8 +21,7 @@ export default defineConfig({
     viewportHeight: 800,
     reporter: 'cypress-multi-reporters',
     reporterOptions: {
-      reporterEnabled:
-        'mocha-junit-reporter, ./scripts/mocha-json-reporter.cjs',
+      reporterEnabled: 'mocha-junit-reporter, ./scripts/mocha-json-reporter.cjs',
       mochaJunitReporterReporterOptions: {
         mochaFile: 'cypress/reports/junit/results-[hash].xml',
         toConsole: false,

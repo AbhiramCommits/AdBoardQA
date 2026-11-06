@@ -51,10 +51,14 @@ export async function renderCampaignBuilderPage(root: HTMLElement): Promise<void
     return;
   }
 
-  const submitButton = root.querySelector<HTMLButtonElement>('[data-cy="create-campaign"]');
+  const submitButton = root.querySelector<HTMLButtonElement>(
+    '[data-cy="create-campaign"]',
+  );
   const loading = root.querySelector<HTMLElement>('[data-cy="form-loading"]');
   const banner = root.querySelector<HTMLElement>('[data-cy="error-banner"]');
-  const bannerMessage = root.querySelector<HTMLElement>('[data-cy="error-banner-message"]');
+  const bannerMessage = root.querySelector<HTMLElement>(
+    '[data-cy="error-banner-message"]',
+  );
   let inFlight = false;
 
   form.addEventListener('submit', (event) => {

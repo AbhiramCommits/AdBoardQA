@@ -17,23 +17,15 @@ describe('Approval workflow', () => {
     });
   });
 
-  it(
-    'submits and approves a campaign as a reviewer',
-    { tags: ['@smoke'] },
-    () => {
-      cy.get<Campaign>('@campaign').then((campaign) => {
-        approvalPage
-          .visit(campaign.id)
-          .expectStatus('draft')
-          .submitForApproval()
-          .approve();
+  it('submits and approves a campaign as a reviewer', { tags: ['@smoke'] }, () => {
+    cy.get<Campaign>('@campaign').then((campaign) => {
+      approvalPage.visit(campaign.id).expectStatus('draft').submitForApproval().approve();
 
-        cy.request(`/api/campaigns/${campaign.id}`)
-          .its('body.status')
-          .should('eq', 'approved');
-      });
-    },
-  );
+      cy.request(`/api/campaigns/${campaign.id}`)
+        .its('body.status')
+        .should('eq', 'approved');
+    });
+  });
 
   it(
     'rejects with a reason and returns the campaign to draft',
@@ -72,57 +64,50 @@ describe('Approval workflow', () => {
     },
   );
 
-  it(
-    'requires a reviewer header to approve',
-    { tags: ['@regression'] },
-    () => {
-      cy.get<Campaign>('@campaign').then((campaign) => {
-        cy.request({
-          method: 'POST',
-          url: `/api/campaigns/${campaign.id}/submit`,
-        }).its('status').should('eq', 200);
+  it('requires a reviewer header to approve', { tags: ['@regression'] }, () => {
+    cy.get<Campaign>('@campaign').then((campaign) => {
+      cy.request({
+        method: 'POST',
+        url: `/api/campaigns/${campaign.id}/submit`,
+      })
+        .its('status')
+        .should('eq', 200);
 
-        cy.request({
-          method: 'POST',
-          url: `/api/campaigns/${campaign.id}/approve`,
-          body: {},
-          failOnStatusCode: false,
-        }).then((response) => {
-          expect(response.status).to.eq(422);
-          expect(response.body.error.code).to.eq('REVIEWER_REQUIRED');
-          expect(response.body.error.field).to.eq('reviewer');
-        });
+      cy.request({
+        method: 'POST',
+        url: `/api/campaigns/${campaign.id}/approve`,
+        body: {},
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.error.code).to.eq('REVIEWER_REQUIRED');
+        expect(response.body.error.field).to.eq('reviewer');
       });
-    },
-  );
+    });
+  });
 
-  it(
-    'cannot submit a campaign with no flights',
-    { tags: ['@regression'] },
-    () => {
-      approvalPage
-        .visit('cmp_seed_draft')
-        .clickSubmit()
-        .expectFieldError('flights', 'Add at least one flight before submitting for approval')
-        .expectStatus('draft');
-    },
-  );
+  it('cannot submit a campaign with no flights', { tags: ['@regression'] }, () => {
+    approvalPage
+      .visit('cmp_seed_draft')
+      .clickSubmit()
+      .expectFieldError(
+        'flights',
+        'Add at least one flight before submitting for approval',
+      )
+      .expectStatus('draft');
+  });
 
-  it(
-    'publishes an approved campaign to live',
-    { tags: ['@regression'] },
-    () => {
-      approvalPage
-        .visit('cmp_seed_approved')
-        .expectStatus('approved')
-        .publish()
-        .expectLive();
+  it('publishes an approved campaign to live', { tags: ['@regression'] }, () => {
+    approvalPage
+      .visit('cmp_seed_approved')
+      .expectStatus('approved')
+      .publish()
+      .expectLive();
 
-      cy.request('/api/campaigns/cmp_seed_approved')
-        .its('body.status')
-        .should('eq', 'live');
-    },
-  );
+    cy.request('/api/campaigns/cmp_seed_approved')
+      .its('body.status')
+      .should('eq', 'live');
+  });
 
   it(
     'refuses every illegal status transition with 409',
@@ -155,7 +140,9 @@ describe('Approval workflow', () => {
         });
       }
 
-      cy.request('/api/campaigns/cmp_seed_draft').its('body.status').should('eq', 'draft');
+      cy.request('/api/campaigns/cmp_seed_draft')
+        .its('body.status')
+        .should('eq', 'draft');
       cy.request('/api/campaigns/cmp_seed_pending')
         .its('body.status')
         .should('eq', 'pending_approval');

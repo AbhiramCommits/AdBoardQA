@@ -25,7 +25,8 @@ export class CampaignBuilderPage {
   }
 
   fillField(field: BuilderField, value: string | number): this {
-    cy.get(FIELD_SELECTORS[field]).clear().type(String(value));
+    cy.get(FIELD_SELECTORS[field]).clear();
+    cy.get(FIELD_SELECTORS[field]).type(String(value));
     return this;
   }
 
@@ -87,9 +88,7 @@ export class CampaignBuilderPage {
   }
 
   expectErrorBanner(message: string): this {
-    cy.get('[data-cy="error-banner"]')
-      .should('be.visible')
-      .and('contain.text', message);
+    cy.get('[data-cy="error-banner"]').should('be.visible').and('contain.text', message);
     return this;
   }
 

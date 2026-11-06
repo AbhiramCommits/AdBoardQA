@@ -53,11 +53,12 @@ export class FlightSchedulerPage {
 
   fillFlight(flight: FlightDraft): this {
     this.selectScreen(flight.screenId);
-    cy.get('[data-cy="flight-start-input"]').clear().type(flight.startDate);
-    cy.get('[data-cy="flight-end-input"]').clear().type(flight.endDate);
-    cy.get('[data-cy="daily-budget-input"]')
-      .clear()
-      .type(String(flight.dailyBudgetDollars));
+    cy.get('[data-cy="flight-start-input"]').clear();
+    cy.get('[data-cy="flight-start-input"]').type(flight.startDate);
+    cy.get('[data-cy="flight-end-input"]').clear();
+    cy.get('[data-cy="flight-end-input"]').type(flight.endDate);
+    cy.get('[data-cy="daily-budget-input"]').clear();
+    cy.get('[data-cy="daily-budget-input"]').type(String(flight.dailyBudgetDollars));
     return this;
   }
 
