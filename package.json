@@ -17,7 +17,7 @@
     "dev": "concurrently -k -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
     "build": "npm run build --workspace app && npm run build --workspace web",
     "typecheck": "npm run typecheck --workspace app && npm run typecheck --workspace web",
-    "test:unit": "npm run test:unit --workspace app",
+    "test:unit": "npm --workspace app run test:unit --",
     "test:e2e": "cypress run",
     "test:smoke": "cypress run --env grepTags=@smoke",
     "test:regression": "cypress run --env grepTags=@regression",
