@@ -21,7 +21,7 @@ export default defineConfig({
     viewportHeight: 800,
     reporter: 'cypress-multi-reporters',
     reporterOptions: {
-      reporterEnabled: 'mocha-junit-reporter, ./scripts/mocha-json-reporter.cjs',
+      reporterEnabled: 'spec, mocha-junit-reporter, ./scripts/mocha-json-reporter.cjs',
       mochaJunitReporterReporterOptions: {
         mochaFile: 'cypress/reports/junit/results-[hash].xml',
         toConsole: false,
